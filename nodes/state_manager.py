@@ -160,7 +160,10 @@ class StateManager:
             
             # Обновляем время после создания всех нод
             import time
-            time.sleep(0.1)  # Небольшая задержка для обновления GUI
+            time.sleep(0.5)  # Увеличенная задержка для полного обновления GUI
+            
+            # Убедимся, что node editor готов принимать связи
+            dpg.split_frame()  # Принудительно обновляем кадр
             
             # Восстанавливаем связи
             for link_data in state.get("links", []):  # Используем .get() на случай отсутствия ключа
@@ -170,20 +173,28 @@ class StateManager:
                 source_node_old_id = link_data.get("source_node")
                 target_node_old_id = link_data.get("target_node")
                 
+                print(f"DEBUG: Attempting to restore link - Source: {source_node_old_id}.{source_key} -> Target: {target_node_old_id}.{target_key}")
+                
                 if source_key and target_key and source_node_old_id and target_node_old_id:
                     # Находим новые ID узлов по соответствию
                     new_source_node_id = old_to_new_node_ids.get(source_node_old_id)
                     new_target_node_id = old_to_new_node_ids.get(target_node_old_id)
                     
+                    print(f"DEBUG: Mapping - Old source: {source_node_old_id} -> New source: {new_source_node_id}")
+                    print(f"DEBUG: Mapping - Old target: {target_node_old_id} -> New target: {new_target_node_id}")
+                    
                     if new_source_node_id and new_target_node_id:
                         # Используем глобальную карту атрибутов для поиска новых ID атрибутов
                         from .base_node import BaseNode
+                        
+                        print(f"DEBUG: Current BaseNode.attr_id_to_key_map keys: {list(BaseNode.attr_id_to_key_map.keys())[:10]}...")  # Показываем первые 10
                         
                         # Находим выходной атрибут исходного узла
                         matched_source_attr = None
                         for attr_id, (node_id, attr_type, key) in BaseNode.attr_id_to_key_map.items():
                             if node_id == new_source_node_id and attr_type == "output" and key == source_key:
                                 matched_source_attr = attr_id
+                                print(f"DEBUG: Found source attr {attr_id} for {new_source_node_id}.{source_key}")
                                 break
                         
                         # Находим входной атрибут целевого узла
@@ -191,6 +202,7 @@ class StateManager:
                         for attr_id, (node_id, attr_type, key) in BaseNode.attr_id_to_key_map.items():
                             if node_id == new_target_node_id and attr_type == "input" and key == target_key:
                                 matched_target_attr = attr_id
+                                print(f"DEBUG: Found target attr {attr_id} for {new_target_node_id}.{target_key}")
                                 break
                         
                         # Создаем связь между найденными атрибутами
@@ -202,10 +214,16 @@ class StateManager:
                                 print(f"⚠️ Не удалось создать связь: {e}")
                         else:
                             print(f"⚠️ Не удалось найти атрибуты для связи: {source_key} -> {target_key}")
+                            print(f"   Matched source attr: {matched_source_attr}, Matched target attr: {matched_target_attr}")
                     else:
                         print(f"⚠️ Не удалось найти узлы для связи: {source_node_old_id} -> {target_node_old_id}")
+                        print(f"   New source node ID: {new_source_node_id}, New target node ID: {new_target_node_id}")
                 else:
                     print(f"⚠️ Недостаточно информации для восстановления связи: {link_data}")
+            
+            # Еще одна задержка после восстановления связей
+            time.sleep(0.1)
+            dpg.split_frame()  # Еще одно обновление кадра для отображения связей
             
             # Восстанавливаем позиции окон
             for window_tag, pos in state.get("window_positions", {}).items():
