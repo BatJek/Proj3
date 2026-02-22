@@ -164,80 +164,48 @@ class StateManager:
             
             # Восстанавливаем связи
             for link_data in state.get("links", []):  # Используем .get() на случай отсутствия ключа
-                source_attr = link_data["source"]
-                target_attr = link_data["target"]
+                # Получаем старые ID узлов и ключи атрибутов из сохраненного состояния
+                source_key = link_data.get("source_key")
+                target_key = link_data.get("target_key")
+                source_node_old_id = link_data.get("source_node")
+                target_node_old_id = link_data.get("target_node")
                 
-                # Проверяем существование атрибутов перед созданием связи
-                if dpg.does_item_exist(source_attr) and dpg.does_item_exist(target_attr):
-                    try:
-                        dpg.add_node_link(source_attr, target_attr, parent="node_editor")
-                    except Exception as e:
-                        print(f"⚠️ Не удалось создать связь: {e}")
-                else:
-                    # Если атрибуты не существуют, пытаемся найти подходящие атрибуты по информации из сохраненного состояния
-                    try:
-                        source_key = link_data.get("source_key")
-                        target_key = link_data.get("target_key")
-                        source_node_old_id = link_data.get("source_node")
-                        target_node_old_id = link_data.get("target_node")
+                if source_key and target_key and source_node_old_id and target_node_old_id:
+                    # Находим новые ID узлов по соответствию
+                    new_source_node_id = old_to_new_node_ids.get(source_node_old_id)
+                    new_target_node_id = old_to_new_node_ids.get(target_node_old_id)
+                    
+                    if new_source_node_id and new_target_node_id:
+                        # Используем глобальную карту атрибутов для поиска новых ID атрибутов
+                        from .base_node import BaseNode
                         
-                        if source_key and target_key:
-                            # Нужно найти новые ID атрибутов по старым ID узлов и ключам
-                            # Для этого нужно установить связи между новыми узлами, основываясь на сохраненной информации
-                            # Это требует более сложной логики, так как мы должны сопоставить старые и новые ID
-                            
-                            # Находим новые ID узлов по соответствию
-                            new_source_node_id = old_to_new_node_ids.get(source_node_old_id)
-                            new_target_node_id = old_to_new_node_ids.get(target_node_old_id)
-                            
-                            if new_source_node_id and new_target_node_id:
-                                # Теперь нужно найти атрибуты в новых узлах по ключам
-                                # Это требует дополнительной информации о структуре узлов
-                                
-                                # Пока используем простой способ - поиск по меткам атрибутов
-                                # Получаем дочерние элементы каждого узла (это будут атрибуты)
-                                source_attrs = dpg.get_item_children(new_source_node_id, 1) or []
-                                target_attrs = dpg.get_item_children(new_target_node_id, 1) or []
-                                
-                                # Находим нужные атрибуты по ключам (метке)
-                                matched_source_attr = None
-                                matched_target_attr = None
-                                
-                                for attr_id in source_attrs:
-                                    if dpg.has_item_component(attr_id, dpg.mvNodeAttr_Output):
-                                        # Это выходной атрибут, проверим его метку
-                                        config = dpg.get_item_configuration(attr_id)
-                                        # Для поиска по ключу нам нужно знать, как он хранится в интерфейсе
-                                        # Поскольку мы не можем напрямую получить ключ, будем использовать другую стратегию
-                                        
-                                        # Используем глобальную карту атрибутов для поиска
-                                        from .base_node import BaseNode
-                                        for attr_id_check, (node_id, attr_type, key) in BaseNode.attr_id_to_key_map.items():
-                                            if node_id == new_source_node_id and attr_type == "output" and key == source_key:
-                                                matched_source_attr = attr_id_check
-                                                break
-                                
-                                for attr_id in target_attrs:
-                                    if dpg.has_item_component(attr_id, dpg.mvNodeAttr_Input):
-                                        # Это входной атрибут, проверим его метку
-                                        config = dpg.get_item_configuration(attr_id)
-                                        
-                                        # Используем глобальную карту атрибутов для поиска
-                                        from .base_node import BaseNode
-                                        for attr_id_check, (node_id, attr_type, key) in BaseNode.attr_id_to_key_map.items():
-                                            if node_id == new_target_node_id and attr_type == "input" and key == target_key:
-                                                matched_target_attr = attr_id_check
-                                                break
-                                
-                                if matched_source_attr and matched_target_attr:
-                                    try:
-                                        dpg.add_node_link(matched_source_attr, matched_target_attr, parent="node_editor")
-                                    except Exception as e:
-                                        print(f"⚠️ Не удалось создать связь по ключам: {e}")
-                                else:
-                                    print(f"⚠️ Не удалось найти атрибуты для связи: {source_key} -> {target_key}")
-                    except Exception as e:
-                        print(f"⚠️ Ошибка при восстановлении связи по ключам: {e}")
+                        # Находим выходной атрибут исходного узла
+                        matched_source_attr = None
+                        for attr_id, (node_id, attr_type, key) in BaseNode.attr_id_to_key_map.items():
+                            if node_id == new_source_node_id and attr_type == "output" and key == source_key:
+                                matched_source_attr = attr_id
+                                break
+                        
+                        # Находим входной атрибут целевого узла
+                        matched_target_attr = None
+                        for attr_id, (node_id, attr_type, key) in BaseNode.attr_id_to_key_map.items():
+                            if node_id == new_target_node_id and attr_type == "input" and key == target_key:
+                                matched_target_attr = attr_id
+                                break
+                        
+                        # Создаем связь между найденными атрибутами
+                        if matched_source_attr and matched_target_attr:
+                            try:
+                                dpg.add_node_link(matched_source_attr, matched_target_attr, parent="node_editor")
+                                print(f"🔗 Создана связь: {matched_source_attr} -> {matched_target_attr}")
+                            except Exception as e:
+                                print(f"⚠️ Не удалось создать связь: {e}")
+                        else:
+                            print(f"⚠️ Не удалось найти атрибуты для связи: {source_key} -> {target_key}")
+                    else:
+                        print(f"⚠️ Не удалось найти узлы для связи: {source_node_old_id} -> {target_node_old_id}")
+                else:
+                    print(f"⚠️ Недостаточно информации для восстановления связи: {link_data}")
             
             # Восстанавливаем позиции окон
             for window_tag, pos in state.get("window_positions", {}).items():
