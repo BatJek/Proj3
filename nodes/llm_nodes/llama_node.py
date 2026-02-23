@@ -128,37 +128,7 @@ class LLaMANode(BaseNode):
                 error_msg = f"Status: Error loading model: {str(e)}"
                 dpg.set_value(self.status_text, error_msg)
                 print(f"❌ Ошибка загрузки модели: {e}")
-            finally:
-                self.is_loading = False
-                dpg.configure_item(self.progress_bar, show=False)
-            """Загрузка модели в фоновом потоке"""
-            try:
-                self.is_loading = True
-                
-                # Имитация прогресса
-                for i in range(1, 101):
-                    time.sleep(0.05)
-                    dpg.configure_item(self.progress_bar, default_value=i/100)
-                
-                # Загрузка модели напрямую через llama_cpp
-                self.llm = Llama(
-                    model_path=self.model_path,
-                    n_gpu_layers=self.parameters["n_gpu_layers"],
-                    n_ctx=self.parameters["n_ctx"],
-                    n_threads=self.parameters["n_threads"],
-                    verbose=False
-                )
-                
-                dpg.set_value(self.status_text, f"Status: Model loaded: {os.path.basename(self.model_path)}")
-                print(f"✅ Модель успешно загружена: {self.model_path}")
-                
-            except Exception as e:
-                error_msg = f"Status: Error loading model: {str(e)}"
-                dpg.set_value(self.status_text, error_msg)
-                print(f"❌ Ошибка загрузки модели: {e}")
-            finally:
-                self.is_loading = False
-                dpg.configure_item(self.progress_bar, show=False)
+
     
     def update_parameter(self, param_name, value):
         """Обновление параметра"""

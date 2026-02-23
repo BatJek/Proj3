@@ -40,9 +40,6 @@ class StateManager:
                     "inputs": {},
                     "outputs": {}
                 }
-<<<<<<< HEAD
-
-=======
                 
                 # Сохраняем значения входов
                 if hasattr(instance, 'inputs'):
@@ -64,7 +61,6 @@ class StateManager:
                         except Exception as e:
                             print(f"Warning: Could not get value for output {output_name}: {e}")
             
->>>>>>> 13d9d6dcb56ecee11d78520bb02c39836d6465ea
             state["nodes"].append(node_data)
 
         # Сохраняем связи по логическим ключам
@@ -180,11 +176,6 @@ class StateManager:
             dpg.split_frame()  # ← принудительное обновление кадра
             time.sleep(0.1)
 
-            # Восстанавливаем связи по логическим ключам
-            for link_data in state.get("links", []):
-                source_node_old_id = link_data.get("source_node_id")
-                target_node_old_id = link_data.get("target_node_id")
-=======
                     
                     # Восстанавливаем внутреннее состояние ноды
                     if hasattr(node, 'from_dict'):
@@ -213,7 +204,8 @@ class StateManager:
             # Восстанавливаем связи
             for link_data in state.get("links", []):  # Используем .get() на случай отсутствия ключа
                 # Получаем старые ID узлов и ключи атрибутов из сохраненного состояния
->>>>>>> 13d9d6dcb56ecee11d78520bb02c39836d6465ea
+                source_node_old_id = link_data.get("source_node_id")
+                target_node_old_id = link_data.get("target_node_id")
                 source_key = link_data.get("source_key")
                 target_key = link_data.get("target_key")
 
@@ -267,12 +259,9 @@ class StateManager:
 
             # Ещё раз обновляем UI
             time.sleep(0.1)
-<<<<<<< HEAD
             dpg.split_frame()
 
-=======
             
->>>>>>> 13d9d6dcb56ecee11d78520bb02c39836d6465ea
             # Восстанавливаем позиции окон
             for window_tag, pos in state.get("window_positions", {}).items():
                 if dpg.does_item_exist(window_tag):
