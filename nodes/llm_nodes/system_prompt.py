@@ -39,7 +39,7 @@ class SystemPromptNode(BaseNode):
         return {
             "node_id": self.node_id,
             "label": self.label,
-            "pos": dpg.get_item_pos(self.node_tag),
+            "pos": dpg.get_item_pos(self.self.node_id),
             "value": self.value
         }
     
