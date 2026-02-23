@@ -132,7 +132,7 @@ def register_node(instance):
 
 def apply_theme_to_node(instance):
     """Применяет тему к конкретной ноде на основе её типа"""
-    if not instance.node_id:
+    if not instance.node_id or not dpg.does_item_exist(instance.node_id):
         return
     
     # Определяем тип ноды по классу
