@@ -1,7 +1,29 @@
 from ..base_node import BaseNode
 import dearpygui.dearpygui as dpg
-from llama_cpp import Llama
-import threading
+
+# Заглушка для Llama
+class Llama:
+    def __init__(self, *args, **kwargs):
+        raise NotImplementedError("Llama model is not available")
+    
+    def create_chat_completion(self, *args, **kwargs):
+        raise NotImplementedError("Llama model is not available")
+
+class threading:
+    class Thread:
+        def __init__(self, target=None, daemon=None, args=(), kwargs={}):
+            self.target = target
+            self.daemon = daemon
+            self.args = args
+            self.kwargs = kwargs
+        
+        def start(self):
+            if self.target:
+                self.target(*self.args, **self.kwargs)
+        
+        def join(self):
+            pass
+
 import time
 import json
 import os

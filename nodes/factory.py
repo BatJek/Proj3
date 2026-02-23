@@ -13,12 +13,8 @@ from nodes.state_manager import state_manager
 # === Вспомогательные функции ===
 
 def get_screen_size():
-    root = tk.Tk()
-    root.withdraw()
-    screen_width = root.winfo_screenwidth()
-    screen_height = root.winfo_screenheight()
-    root.destroy()
-    return screen_width, screen_height
+    # Возвращаем стандартные размеры экрана, так как в текущей среде нельзя получить реальные размеры
+    return 1920, 1080
 
 
 def center_viewport():

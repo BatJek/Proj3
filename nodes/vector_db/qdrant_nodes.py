@@ -1,8 +1,32 @@
 # nodes\vector_db\qdrant_nodes.py
 import dearpygui.dearpygui as dpg
 from ..base_node import BaseNode
-from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams, PointStruct
+
+# Заглушка для QdrantClient
+class QdrantClient:
+    def __init__(self, *args, **kwargs):
+        raise NotImplementedError("Qdrant client is not available")
+    
+    def get_collections(self):
+        raise NotImplementedError("Qdrant client is not available")
+    
+    def create_collection(self, *args, **kwargs):
+        raise NotImplementedError("Qdrant client is not available")
+    
+    def upsert(self, *args, **kwargs):
+        raise NotImplementedError("Qdrant client is not available")
+
+class Distance:
+    COSINE = "cosine"
+
+class VectorParams:
+    def __init__(self, *args, **kwargs):
+        pass
+
+class PointStruct:
+    def __init__(self, *args, **kwargs):
+        pass
+
 import numpy as np
 import json
 import os

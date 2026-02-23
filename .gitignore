@@ -1,1 +1,67 @@
-Nothing should be ignored based on the provided file changes. The only modified file is 'nodes/state_manager.py', which is a source code file and should not be added to .gitignore.
+```gitignore
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Compiled Python files
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+
+# Dependencies
+venv/
+.venv/
+env/
+ENV/
+.ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Build and distribution
+build/
+dist/
+*.egg
+*.whl
+coverage/
+htmlcov/
+.tox/
+.nox/
+.coverage
+.pytest_cache/
+.mypy_cache/
+.hypothesis/
+
+# Environment specific
+.env
+.env.local
+.env.dev
+.env.prod
+.env.backup
+*.env*
+.envrc
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+```
