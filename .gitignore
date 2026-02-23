@@ -1,2 +1,6 @@
+<<<<<<< HEAD
 Nothing should be ignored based on the provided file changes. The only modified file is 'nodes/state_manager.py', which is a source code file and should not be added to .gitignore.
 *.pyc
+=======
+(nodes/base_node.py, nodes/factory.py, nodes/registry.py, nodes/state_manager.py, nodes/vector_db/qdrant_nodes.py)
+>>>>>>> 13d9d6dcb56ecee11d78520bb02c39836d6465ea

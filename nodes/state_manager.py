@@ -40,7 +40,31 @@ class StateManager:
                     "inputs": {},
                     "outputs": {}
                 }
+<<<<<<< HEAD
 
+=======
+                
+                # Сохраняем значения входов
+                if hasattr(instance, 'inputs'):
+                    for input_name, input_item in instance.inputs.items():
+                        try:
+                            value = dpg.get_value(input_item)
+                            if value is not None:
+                                node_data["inputs"][input_name] = value
+                        except Exception as e:
+                            print(f"Warning: Could not get value for input {input_name}: {e}")
+                
+                # Сохраняем значения выходов
+                if hasattr(instance, 'outputs'):
+                    for output_name, output_item in instance.outputs.items():
+                        try:
+                            value = dpg.get_value(output_item)
+                            if value is not None:
+                                node_data["outputs"][output_name] = value
+                        except Exception as e:
+                            print(f"Warning: Could not get value for output {output_name}: {e}")
+            
+>>>>>>> 13d9d6dcb56ecee11d78520bb02c39836d6465ea
             state["nodes"].append(node_data)
 
         # Сохраняем связи по логическим ключам
@@ -132,6 +156,7 @@ class StateManager:
                 original_id = node_data.get("id")
                 if original_id is not None:
                     old_to_new_node_ids[original_id] = node_id
+<<<<<<< HEAD
 
                 # Восстанавливаем состояние
                 if hasattr(node, 'from_dict'):
@@ -159,6 +184,36 @@ class StateManager:
             for link_data in state.get("links", []):
                 source_node_old_id = link_data.get("source_node_id")
                 target_node_old_id = link_data.get("target_node_id")
+=======
+                    
+                    # Восстанавливаем внутреннее состояние ноды
+                    if hasattr(node, 'from_dict'):
+                        node.from_dict(node_data)
+                    else:
+                        # Альтернативное восстановление состояния для нод без from_dict
+                        for key, value in node_data.get("inputs", {}).items():
+                            if hasattr(node, 'inputs') and key in node.inputs:
+                                try:
+                                    dpg.set_value(node.inputs[key], value)
+                                except Exception as e:
+                                    print(f"Warning: Could not set value for input {key}: {e}")
+                        for key, value in node_data.get("outputs", {}).items():
+                            if hasattr(node, 'outputs') and key in node.outputs:
+                                try:
+                                    dpg.set_value(node.outputs[key], value)
+                                except Exception as e:
+                                    print(f"Warning: Could not set value for output {key}: {e}")
+            
+            # Обновляем время после создания всех нод
+            time.sleep(0.5)  # Увеличенная задержка для полного обновления GUI
+            
+            # Убедимся, что node editor готов принимать связи
+            dpg.split_frame()  # Принудительно обновляем кадр
+            
+            # Восстанавливаем связи
+            for link_data in state.get("links", []):  # Используем .get() на случай отсутствия ключа
+                # Получаем старые ID узлов и ключи атрибутов из сохраненного состояния
+>>>>>>> 13d9d6dcb56ecee11d78520bb02c39836d6465ea
                 source_key = link_data.get("source_key")
                 target_key = link_data.get("target_key")
 
@@ -212,8 +267,12 @@ class StateManager:
 
             # Ещё раз обновляем UI
             time.sleep(0.1)
+<<<<<<< HEAD
             dpg.split_frame()
 
+=======
+            
+>>>>>>> 13d9d6dcb56ecee11d78520bb02c39836d6465ea
             # Восстанавливаем позиции окон
             for window_tag, pos in state.get("window_positions", {}).items():
                 if dpg.does_item_exist(window_tag):

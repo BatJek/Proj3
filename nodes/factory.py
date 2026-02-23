@@ -199,6 +199,7 @@ def _drop_callback(sender, app_data, user_data):
         print(f"ERROR in drop_callback: {str(e)}")
         import traceback
         traceback.print_exc()
+        # Убедимся, что все ошибки обрабатываются корректно
 
 
 
