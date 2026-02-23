@@ -46,8 +46,8 @@ class StateManager:
                             value = dpg.get_value(input_item)
                             if value is not None:
                                 node_data["inputs"][input_name] = value
-                        except:
-                            pass
+                        except Exception as e:
+                            print(f"Warning: Could not get value for input {input_name}: {e}")
                 
                 # Сохраняем значения выходов
                 if hasattr(instance, 'outputs'):
@@ -56,8 +56,8 @@ class StateManager:
                             value = dpg.get_value(output_item)
                             if value is not None:
                                 node_data["outputs"][output_name] = value
-                        except:
-                            pass
+                        except Exception as e:
+                            print(f"Warning: Could not get value for output {output_name}: {e}")
             
             state["nodes"].append(node_data)
         
@@ -149,17 +149,16 @@ class StateManager:
                             if hasattr(node, 'inputs') and key in node.inputs:
                                 try:
                                     dpg.set_value(node.inputs[key], value)
-                                except:
-                                    pass
+                                except Exception as e:
+                                    print(f"Warning: Could not set value for input {key}: {e}")
                         for key, value in node_data.get("outputs", {}).items():
                             if hasattr(node, 'outputs') and key in node.outputs:
                                 try:
                                     dpg.set_value(node.outputs[key], value)
-                                except:
-                                    pass
+                                except Exception as e:
+                                    print(f"Warning: Could not set value for output {key}: {e}")
             
             # Обновляем время после создания всех нод
-            import time
             time.sleep(0.5)  # Увеличенная задержка для полного обновления GUI
             
             # Убедимся, что node editor готов принимать связи
@@ -223,7 +222,6 @@ class StateManager:
             
             # Еще одна задержка после восстановления связей
             time.sleep(0.1)
-            dpg.split_frame()  # Еще одно обновление кадра для отображения связей
             
             # Восстанавливаем позиции окон
             for window_tag, pos in state.get("window_positions", {}).items():

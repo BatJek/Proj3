@@ -201,7 +201,8 @@ class QdrantAddNode(BaseNode):
             try:
                 collections = self.client.get_collections().collections
                 collection_names = [c.name for c in collections]
-            except:
+            except Exception as e:
+                print(f"Warning: Could not get collections list: {e}")
                 collection_names = []
                 
             if collection_name not in collection_names:

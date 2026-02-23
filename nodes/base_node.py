@@ -19,8 +19,6 @@ class BaseNode(ABC):
         # --- НОВОЕ: внутреннее состояние для данных ---
         self.state = {"inputs": {}, "outputs": {}}
         # ---
-        self.outputs = {}
-        self.inputs = {}
 
 
     
@@ -130,7 +128,8 @@ class BaseNode(ABC):
             try:
                 value = dpg.get_value(widget_id)
                 state["inputs"][key] = value
-            except Exception:
+            except Exception as e:
+                print(f"Warning: Could not get value for input {key}: {e}")
                 state["inputs"][key] = None
         
         # Сохраняем значения выходов
@@ -138,7 +137,8 @@ class BaseNode(ABC):
             try:
                 value = dpg.get_value(widget_id)
                 state["outputs"][key] = value
-            except Exception:
+            except Exception as e:
+                print(f"Warning: Could not get value for output {key}: {e}")
                 state["outputs"][key] = None
                 
         return state
@@ -153,16 +153,16 @@ class BaseNode(ABC):
             if hasattr(self, 'inputs') and key in self.inputs:
                 try:
                     dpg.set_value(self.inputs[key], value)
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(f"Warning: Could not set value for input {key}: {e}")
         
         # Восстанавливаем значения выходов
         for key, value in data.get("outputs", {}).items():
             if hasattr(self, 'outputs') and key in self.outputs:
                 try:
                     dpg.set_value(self.outputs[key], value)
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(f"Warning: Could not set value for output {key}: {e}")
         
         # Восстанавливаем внутреннее состояние
         internal_state = data.get("internal_state", {})
