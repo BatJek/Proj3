@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+/env
+nodes/__pycache__
+saved_states
+*.pyc
+=======
 ```
 # Compiled Python files
 *.pyc
@@ -36,3 +42,4 @@ node_modules/
 .mypy_cache/
 .pytest_cache/
 ```
+>>>>>>> 301fb69fe7e47e3285510de20f7dcca71ab2c080

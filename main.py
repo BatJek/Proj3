@@ -13,7 +13,7 @@ if __name__ == "__main__":
     # Загрузка шрифта...
     try:
         with dpg.font_registry():
-            font_path = "Radiotechnika.ttf"
+            font_path = "I:\\My\\LLM\\RAG\\dearpygui\\Proj3\\NotoSans-Regular.ttf"
             with dpg.font(font_path, 18) as font1:
                 dpg.add_font_range_hint(dpg.mvFontRangeHint_Cyrillic)
             dpg.bind_font(font1)
