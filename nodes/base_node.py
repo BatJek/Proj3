@@ -168,3 +168,24 @@ class BaseNode(ABC):
         internal_state = data.get("internal_state", {})
         if internal_state:
             self.state = internal_state 
+
+
+
+    def add_attribute(self, label, direction, default_value=0.0):
+        # 1. Создаем атрибут в DPG
+        attr_id = dpg.add_node_attribute(label=label, default_value=default_value, direction=direction)
+        
+        # 2. СРАЗУ же записываем в маппинг
+        # self.tag - это DPG ID ноды (int)
+        attr_type = "output" if direction == dpg.mvAttr_Out else "input"
+        BaseNode.attr_id_to_key_map[attr_id] = (self.tag, attr_type, label)
+        
+        return attr_id
+
+    def __del__(self):
+        # Желательно очищать маппинг при удалении ноды, 
+        # хотя load_state теперь делает clear() глобально.
+        # Но для безопасности при удалении отдельных нод в редакторе:
+        keys_to_remove = [k for k, v in BaseNode.attr_id_to_key_map.items() if v[0] == self.tag]
+        for k in keys_to_remove:
+            del BaseNode.attr_id_to_key_map[k]

@@ -40,40 +40,14 @@ class StateManager:
                     "inputs": {},
                     "outputs": {}
                 }
-                
-                # Сохраняем значения входов
-                if hasattr(instance, 'inputs'):
-                    for input_name, input_item in instance.inputs.items():
-                        try:
-                            value = dpg.get_value(input_item)
-                            if value is not None:
-                                node_data["inputs"][input_name] = value
-                        except Exception as e:
-                            print(f"Warning: Could not get value for input {input_name}: {e}")
-                
-                # Сохраняем значения выходов
-                if hasattr(instance, 'outputs'):
-                    for output_name, output_item in instance.outputs.items():
-                        try:
-                            value = dpg.get_value(output_item)
-                            if value is not None:
-                                node_data["outputs"][output_name] = value
-                        except Exception as e:
-                            print(f"Warning: Could not get value for output {output_name}: {e}")
-            
+
             state["nodes"].append(node_data)
 
         # Сохраняем связи по логическим ключам
         try:
-            print(f"🔍 Проверка связей:")
             links = dpg.get_item_children("node_editor", 1)
-            print(f"   Количество элементов в node_editor[1]: {len(links)}")
-            for link in links:
-                print(f"      - item_id={link}, type={dpg.get_item_type(link)}, cfg={dpg.get_item_configuration(link)}")
+            print(f"🔍 Найдено связей: {len(links)}")  # ← отладка
 
-
-
-            links = dpg.get_item_children("node_editor", 1)
             for link in links:
                 if dpg.get_item_type(link) == "mvAppItemType::mvNodeLink":
                     cfg = dpg.get_item_configuration(link)
@@ -84,17 +58,14 @@ class StateManager:
                     tgt_info = BaseNode.attr_id_to_key_map.get(target_attr_id)
 
                     if src_info and tgt_info:
-                        source_node_id, _, source_key = src_info
-                        target_node_id, _, target_key = tgt_info
-
                         state["links"].append({
-                            "source_node_id": source_node_id,
-                            "source_key": source_key,
-                            "target_node_id": target_node_id,
-                            "target_key": target_key
+                            "source_node_id": src_info[0],
+                            "source_key": src_info[2],
+                            "target_node_id": tgt_info[0],
+                            "target_key": tgt_info[2]
                         })
         except Exception as e:
-            print(f"⚠️ Не удалось получить связи: {e}")
+            print(f"⚠️ Ошибка при сохранении связей: {e}")
 
         # Сохраняем позиции окон
         for window_tag in ["Node_Palette_Box", "Node_Editor_Box", "status_log"]:
@@ -152,58 +123,20 @@ class StateManager:
                 original_id = node_data.get("id")
                 if original_id is not None:
                     old_to_new_node_ids[original_id] = node_id
-<<<<<<< HEAD
 
                 # Восстанавливаем состояние
                 if hasattr(node, 'from_dict'):
                     node.from_dict(node_data)
-                else:
-                    for key, value in node_data.get("inputs", {}).items():
-                        if hasattr(node, 'inputs') and key in node.inputs:
-                            try:
-                                dpg.set_value(node.inputs[key], value)
-                            except Exception:
-                                pass
-                    for key, value in node_data.get("outputs", {}).items():
-                        if hasattr(node, 'outputs') and key in node.outputs:
-                            try:
-                                dpg.set_value(node.outputs[key], value)
-                            except Exception:
-                                pass
 
-            # ⚠️ КРИТИЧНО: дать DPG обновить UI и зарегистрировать атрибуты
-            time.sleep(0.3)
-            dpg.split_frame()  # ← принудительное обновление кадра
+            # ⚠️ КРИТИЧНО: дать DPG обработать атрибуты
             time.sleep(0.1)
+            dpg.split_frame()  # ← принудительно обновляет UI и регистрирует атрибуты
+            time.sleep(0.2)
 
-                    
-                    # Восстанавливаем внутреннее состояние ноды
-                    if hasattr(node, 'from_dict'):
-                        node.from_dict(node_data)
-                    else:
-                        # Альтернативное восстановление состояния для нод без from_dict
-                        for key, value in node_data.get("inputs", {}).items():
-                            if hasattr(node, 'inputs') and key in node.inputs:
-                                try:
-                                    dpg.set_value(node.inputs[key], value)
-                                except Exception as e:
-                                    print(f"Warning: Could not set value for input {key}: {e}")
-                        for key, value in node_data.get("outputs", {}).items():
-                            if hasattr(node, 'outputs') and key in node.outputs:
-                                try:
-                                    dpg.set_value(node.outputs[key], value)
-                                except Exception as e:
-                                    print(f"Warning: Could not set value for output {key}: {e}")
-            
-            # Обновляем время после создания всех нод
-            time.sleep(0.5)  # Увеличенная задержка для полного обновления GUI
-            
-            # Убедимся, что node editor готов принимать связи
-            dpg.split_frame()  # Принудительно обновляем кадр
-            
-            # Восстанавливаем связи
-            for link_data in state.get("links", []):  # Используем .get() на случай отсутствия ключа
-                # Получаем старые ID узлов и ключи атрибутов из сохраненного состояния
+            print(f"🔍 attr_id_to_key_map после создания нод = {BaseNode.attr_id_to_key_map}")
+
+            # Восстанавливаем связи по логическим ключам
+            for link_data in state.get("links", []):
                 source_node_old_id = link_data.get("source_node_id")
                 target_node_old_id = link_data.get("target_node_id")
                 source_key = link_data.get("source_key")
@@ -219,13 +152,6 @@ class StateManager:
                 if not (new_source_id and new_target_id):
                     print(f"⚠️ Не найдены новые ID для связи: {source_node_old_id} → {target_node_old_id}")
                     continue
-                
-                
-                # 🔍 Логируем текущее состояние attr_id_to_key_map
-                print(f"\n🔍 Попытка восстановить связь:")
-                print(f"   Старые: {source_node_old_id}.{source_key} → {target_node_old_id}.{target_key}")
-                print(f"   Новые ID: {new_source_id}, {new_target_id}")
-
 
                 # Ищем атрибуты по node_id + key
                 src_attr = next(
@@ -243,25 +169,24 @@ class StateManager:
                     None
                 )
 
-                if src_attr and tgt_attr:
-                    try:
-                        dpg.add_node_link(src_attr, tgt_attr, parent="node_editor")
-                        print(f"🔗 Восстановлена связь: {new_source_id}.{source_key} → {new_target_id}.{target_key}")
-                    except Exception as e:
-                        print(f"⚠️ Не удалось создать связь: {e}")
-                else:
-                    print(
-                        f"⚠️ Не найдены атрибуты для связи: "
-                        f"{new_source_id}.{source_key} → {new_target_id}.{target_key}"
-                    )
-                    # Для отладки: показываем первые 5 записей из attr_id_to_key_map
-                    print(f"   Доступные в attr_id_to_key_map: {list(BaseNode.attr_id_to_key_map.items())[:5]}")
+                print(f"🔍 Попытка восстановить связь: {new_source_id}.{source_key} → {new_target_id}.{target_key}")
+                print(f"   Найденные атрибуты: src={src_attr}, tgt={tgt_attr}")
+
+                if not (src_attr and tgt_attr):
+                    print(f"❌ Не найдены все необходимые атрибуты!")
+                    continue
+
+                # ✅ Попытка создания связи
+                try:
+                    link_id = dpg.add_node_link(src_attr, tgt_attr, parent="node_editor")
+                    print(f"✅ Связь создана: {link_id} ({src_attr} → {tgt_attr})")
+                except Exception as e:
+                    print(f"❌ Ошибка при создании связи: {e}")
 
             # Ещё раз обновляем UI
             time.sleep(0.1)
             dpg.split_frame()
 
-            
             # Восстанавливаем позиции окон
             for window_tag, pos in state.get("window_positions", {}).items():
                 if dpg.does_item_exist(window_tag):
