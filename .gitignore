@@ -1,1 +1,38 @@
-Nothing should be ignored based on the provided file changes. The only modified file is 'nodes/state_manager.py', which is a source code file and should not be ignored. No build artifacts, dependencies, or temporary files are present in the changes.
+```
+# Compiled Python files
+*.pyc
+__pycache__/
+
+# Virtual environments
+venv/
+.venv/
+.env
+.env.local
+*.env.*
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+
+# Coverage reports
+.coverage
+coverage/
+htmlcov/
+
+# IDE specific
+.vscode/
+.idea/
+
+# Build artifacts
+build/
+dist/
+target/
+
+# Dependency management
+node_modules/
+.mypy_cache/
+.pytest_cache/
+```
