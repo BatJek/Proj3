@@ -10,12 +10,21 @@ import time  # ← добавлено!
 if __name__ == "__main__":
     dpg.create_context()
 
-    # Загрузка шрифта...
+    # Загрузка основного шрифта и шрифта для эмодзи...
     try:
         with dpg.font_registry():
-            font_path = "I:\\My\\LLM\\RAG\\dearpygui\\Proj3\\NotoSans-Regular.ttf"
+            font_path = "I:\My\LLM\RAG\dearpygui\Proj3\NotoSans-Regular.ttf"
             with dpg.font(font_path, 18) as font1:
                 dpg.add_font_range_hint(dpg.mvFontRangeHint_Cyrillic)
+                
+                # Настройка диапазонов Unicode для эмодзи в основном шрифте
+                # Эти диапазоны охватывают основные эмодзи-символы
+                dpg.add_font_range(0x1F600, 0x1F64F, font=font1)  # Emoticons
+                dpg.add_font_range(0x1F300, 0x1F5FF, font=font1)  # Misc Symbols and Pictographs
+                dpg.add_font_range(0x1F680, 0x1F6FF, font=font1)  # Transport and Map Symbols
+                dpg.add_font_range(0x2600, 0x26FF, font=font1)    # Misc symbols
+                dpg.add_font_range(0x2700, 0x27BF, font=font1)    # Dingbats
+                
             dpg.bind_font(font1)
     except Exception as e:
         print(f"⚠️ Ошибка загрузки шрифта: {e}")

@@ -1,45 +1,4 @@
-<<<<<<< HEAD
-/env
-nodes/__pycache__
-saved_states
-*.pyc
-=======
 ```
-# Compiled Python files
-*.pyc
-__pycache__/
-
-# Virtual environments
-venv/
-.venv/
-.env
-.env.local
-*.env.*
-
-# Logs
-*.log
-
-# Temporary files
-*.tmp
-*.swp
-
-# Coverage reports
-.coverage
-coverage/
-htmlcov/
-
-# IDE specific
-.vscode/
-.idea/
-
-# Build artifacts
-build/
-dist/
-target/
-
-# Dependency management
-node_modules/
-.mypy_cache/
-.pytest_cache/
+# Backup files
+*_backup.py
 ```
->>>>>>> 301fb69fe7e47e3285510de20f7dcca71ab2c080
