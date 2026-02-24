@@ -45,10 +45,23 @@ class StateManager:
 
         # Сохраняем связи по логическим ключам
         try:
-            links = dpg.get_item_children("node_editor", 1)
-            print(f"🔍 Найдено связей: {len(links)}")  # ← отладка
+            # Получаем связи из node editor
+            link_items = []
+            # Проверяем, существует ли редактор узлов
+            if dpg.does_item_exist("node_editor"):
+                # Вариант 1: Пробуем получить детей с параметром 1 (это должно быть connections)
+                link_items = dpg.get_item_children("node_editor", 1) or []
+                
+                # Если не нашли через параметр 1, пробуем получить все элементы и отфильтровать
+                if not link_items:
+                    all_children = dpg.get_item_children("node_editor", 0) or []
+                    for child in all_children:
+                        if dpg.get_item_type(child) == "mvAppItemType::mvNodeLink":
+                            link_items.append(child)
+            
+            print(f"🔍 Найдено связей: {len(link_items)}")  # ← отладка
 
-            for link in links:
+            for link in link_items:
                 if dpg.get_item_type(link) == "mvAppItemType::mvNodeLink":
                     cfg = dpg.get_item_configuration(link)
                     source_attr_id = int(cfg['attr_1'])
@@ -64,8 +77,13 @@ class StateManager:
                             "target_node_id": tgt_info[0],
                             "target_key": tgt_info[2]
                         })
+                    else:
+                        print(f"⚠️ Не найдена информация о связях для атрибутов {source_attr_id} -> {target_attr_id}")
+                        print(f"   attr_id_to_key_map: {dict(list(BaseNode.attr_id_to_key_map.items())[:10])}")  # первые 10 для отладки
         except Exception as e:
             print(f"⚠️ Ошибка при сохранении связей: {e}")
+            import traceback
+            traceback.print_exc()
 
         # Сохраняем позиции окон
         for window_tag in ["Node_Palette_Box", "Node_Editor_Box", "status_log"]:
